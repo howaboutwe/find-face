@@ -1,6 +1,11 @@
-#include "opencv2/objdetect/objdetect.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv/cv.h"
+#include "opencv/highgui.h"
+
+#ifdef OPENCV_2_1
+#  include "opencv/highgui.hpp"
+#else
+#  include "opencv2/highgui/highgui.hpp"
+#endif
 
 #include <iostream>
 #include <fstream>
