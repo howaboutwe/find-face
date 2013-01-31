@@ -14,11 +14,6 @@ using namespace cv;
 
 #define USAGE "USAGE: find-face --cascade=PATH.xml [ --scale=SCALE ] IMAGE"
 
-bool starts_with(std::string &string, const char *comparator) {
-  size_t length = string.length();
-  return string.compare(0, length, comparator, length) == 0;
-}
-
 int main(int argc, const char** argv)
 {
   std::string cascade_name;
