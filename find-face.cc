@@ -10,6 +10,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
+
 using namespace cv;
 
 #define USAGE "USAGE: find-face --cascade=PATH.xml [ --scale=SCALE ] IMAGE"
@@ -34,8 +36,6 @@ int main(int argc, const char** argv)
       arg >> scale;
       if (scale < 1)
         scale = 1;
-      std::cout << scale << std::endl;
-      return 0;
     } else if (help_opt == argv[i]) {
       std::cout << USAGE << std::endl;
       return 0;
@@ -72,12 +72,12 @@ int main(int argc, const char** argv)
     resize(gray, small_image, small_image.size(), 0, 0, INTER_LINEAR);
     equalizeHist(small_image, small_image);
 
-    vector<Rect> faces;
+    std::vector<Rect> faces;
     cascade.detectMultiScale(small_image, faces, 1.1, 2, 0, Size(30, 30));
     if (!faces.empty()) {
       unsigned int max_area = 0;
-      vector<Rect>::const_iterator max_region = faces.end();
-      for (vector<Rect>::const_iterator r = faces.begin(); r != faces.end(); r++) {
+      std::vector<Rect>::const_iterator max_region = faces.end();
+      for (std::vector<Rect>::const_iterator r = faces.begin(); r != faces.end(); r++) {
         float area = r->width * r->height;
         if (area > max_area) {
           max_area = area;
