@@ -29,8 +29,13 @@ int main(int argc, const char** argv)
     if (cascade_opt.compare(0, cascade_opt.length(), argv[i], cascade_opt.length()) == 0) {
       cascade_name.assign(argv[i] + cascade_opt.length());
     } else if (scale_opt.compare(0, scale_opt.length(), argv[i], scale_opt.length()) == 0) {
-      if (!sscanf(argv[i] + scale_opt.length(), "%lf", &scale) || scale < 1)
+      std::istringstream arg(argv[i] + scale_opt.length());
+      double scale;
+      arg >> scale;
+      if (scale < 1)
         scale = 1;
+      std::cout << scale << std::endl;
+      return 0;
     } else if (help_opt == argv[i]) {
       std::cout << USAGE << std::endl;
       return 0;
@@ -71,21 +76,22 @@ int main(int argc, const char** argv)
     cascade.detectMultiScale(small_image, faces, 1.1, 2, 0, Size(30, 30));
     if (!faces.empty()) {
       unsigned int max_area = 0;
-      const Rect *max_region;
+      vector<Rect>::const_iterator max_region = faces.end();
       for (vector<Rect>::const_iterator r = faces.begin(); r != faces.end(); r++) {
         float area = r->width * r->height;
         if (area > max_area) {
           max_area = area;
-          max_region = &*r;
+          max_region = r;
         }
       }
 
-      /* Should happen, but guard against all areas being <= 0. */
-      if (!max_region)
-        return 0;
-
       float image_width  = static_cast<float>(image.rows);
       float image_height = static_cast<float>(image.cols);
+
+      /* These shouldn't happen, but guard for stability. */
+      if (max_region == faces.end() || image_width == 0 || image_height == 0)
+        return 0;
+
       std::cout
         << max_region->x / image_width << " "
         << max_region->y / image_height << " "
