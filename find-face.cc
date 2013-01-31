@@ -74,10 +74,28 @@ int main(int argc, const char** argv)
 
     vector<Rect> faces;
     cascade.detectMultiScale(small_image, faces, 1.1, 2, 0, Size(30, 30));
-    for (vector<Rect>::const_iterator r = faces.begin(); r != faces.end(); r++) {
-      float width  = static_cast<float>(image.rows);
-      float height = static_cast<float>(image.cols);
-      std::cout << r->x / width << " " << r->y / height << " " << r->width / width << " " << r->height / height << std::endl;
+    if (!faces.empty()) {
+      unsigned int max_area = 0;
+      const Rect *max_region;
+      for (vector<Rect>::const_iterator r = faces.begin(); r != faces.end(); r++) {
+        float area = r->width * r->height;
+        if (area > max_area) {
+          max_area = area;
+          max_region = &*r;
+        }
+      }
+
+      /* Should happen, but guard against all areas being <= 0. */
+      if (!max_region)
+        return 0;
+
+      float image_width  = static_cast<float>(image.rows);
+      float image_height = static_cast<float>(image.cols);
+      std::cout
+        << max_region->x / image_width << " "
+        << max_region->y / image_height << " "
+        << max_region->width / image_width << " "
+        << max_region->height / image_height << std::endl;
     }
   }
 
