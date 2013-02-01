@@ -85,8 +85,8 @@ int main(int argc, const char** argv)
         }
       }
 
-      float image_width  = static_cast<float>(image.rows);
-      float image_height = static_cast<float>(image.cols);
+      float image_width  = static_cast<float>(image.size().width);
+      float image_height = static_cast<float>(image.size().height);
 
       /* These shouldn't happen, but guard for stability. */
       if (max_region == faces.end() || image_width == 0 || image_height == 0)
