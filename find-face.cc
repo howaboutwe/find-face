@@ -41,62 +41,63 @@ int main(int argc, const char** argv)
       return 0;
     } else {
       input_name.assign(argv[i]);
-    }
-  }
 
-  if (cascade_name.empty()) {
-    std::cerr << "ERROR: --cascade=PATH argument required" << std::endl;
-    return -1;
-  }
-
-  if (!cascade.load(cascade_name)) {
-    std::cerr << "ERROR: could not load classifier cascade: " << cascade_name << std::endl;
-    return -1;
-  }
-
-  if (input_name.empty()) {
-    std::cerr << "ERROR: image name required" << std::endl;
-    return -1;
-  }
-
-  std::ifstream file(input_name.c_str());
-  if (!file.good()) {
-    std::cerr << "file not found or not readable: " << input_name << std::endl;
-    return -1;
-  }
-
-  Mat image = imread(input_name, 1);
-  if (!image.empty()) {
-    Mat gray, small_image(cvRound(image.rows/scale), cvRound(image.cols/scale), CV_8UC1);
-    cvtColor(image, gray, CV_BGR2GRAY);
-    resize(gray, small_image, small_image.size(), 0, 0, INTER_LINEAR);
-    equalizeHist(small_image, small_image);
-
-    std::vector<Rect> faces;
-    cascade.detectMultiScale(small_image, faces, 1.1, 2, 0, Size(30, 30));
-    if (!faces.empty()) {
-      unsigned int max_area = 0;
-      std::vector<Rect>::const_iterator max_region = faces.end();
-      for (std::vector<Rect>::const_iterator r = faces.begin(); r != faces.end(); r++) {
-        float area = r->width * r->height;
-        if (area > max_area) {
-          max_area = area;
-          max_region = r;
-        }
+      if (cascade_name.empty()) {
+        std::cerr << "ERROR: --cascade=PATH argument required" << std::endl;
+        return -1;
       }
 
-      float image_width  = static_cast<float>(image.size().width);
-      float image_height = static_cast<float>(image.size().height);
+      if (!cascade.load(cascade_name)) {
+        std::cerr << "ERROR: could not load classifier cascade: " << cascade_name << std::endl;
+        return -1;
+      }
 
-      /* These shouldn't happen, but guard for stability. */
-      if (max_region == faces.end() || image_width == 0 || image_height == 0)
-        return 0;
+      if (input_name.empty()) {
+        std::cerr << "ERROR: image name required" << std::endl;
+        return -1;
+      }
 
-      std::cout
-        << max_region->x / image_width << " "
-        << max_region->y / image_height << " "
-        << max_region->width / image_width << " "
-        << max_region->height / image_height << std::endl;
+      std::ifstream file(input_name.c_str());
+      if (!file.good()) {
+        std::cerr << "file not found or not readable: " << input_name << std::endl;
+        return -1;
+      }
+
+      Mat image = imread(input_name, 1);
+      if (!image.empty()) {
+        Mat gray, small_image(cvRound(image.rows/scale), cvRound(image.cols/scale), CV_8UC1);
+        cvtColor(image, gray, CV_BGR2GRAY);
+        resize(gray, small_image, small_image.size(), 0, 0, INTER_LINEAR);
+        equalizeHist(small_image, small_image);
+
+        std::vector<Rect> faces;
+        cascade.detectMultiScale(small_image, faces, 1.1, 2, 0, Size(30, 30));
+        if (!faces.empty()) {
+          unsigned int max_area = 0;
+          std::vector<Rect>::const_iterator max_region = faces.end();
+          for (std::vector<Rect>::const_iterator r = faces.begin(); r != faces.end(); r++) {
+            float area = r->width * r->height;
+            if (area > max_area) {
+              max_area = area;
+              max_region = r;
+            }
+          }
+
+          float image_width  = static_cast<float>(image.size().width);
+          float image_height = static_cast<float>(image.size().height);
+
+          /* These shouldn't happen, but guard for stability. */
+          if (max_region == faces.end() || image_width == 0 || image_height == 0)
+            return 0;
+
+          std::cout
+            << input_name << " "
+            << max_region->x / image_width << " "
+            << max_region->y / image_height << " "
+            << max_region->width / image_width << " "
+            << max_region->height / image_height << std::endl;
+        }
+      }
     }
   }
 
