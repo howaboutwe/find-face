@@ -113,7 +113,7 @@ int main(int argc, const char** argv)
                 << " -page "
                 << (center_face_offset_x>0 ? "+" : "") 
                 << static_cast<int>(center_face_offset_x)
-                << (center_face_offset_x>0 ? "+" : "") 
+                << (center_face_offset_y>0 ? "+" : "") 
                 << static_cast<int>(center_face_offset_y) << " "
                 << "-background none -flatten "
                 << "'" << input_name << ".centered.jpg" << "'"
